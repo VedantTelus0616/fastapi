@@ -1,0 +1,7 @@
+*.h5
+*.csv
+.*.swp
+__pycache__
+.DS_Store
+.vscode/
+DB/*
