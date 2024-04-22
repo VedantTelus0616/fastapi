@@ -112,28 +112,8 @@ async def dedup(csv_file: Annotated[bytes, File()], col_name: Annotated[str, For
     df = add_results_to_df(df, results)
     return stream_dataframe(df)
 
+
 @app.post("/dedup_json")
-async def dedup_json(json_file: UploadFile=File(...)):
-    content = await json_file.read()
-    json_data = json.loads(content)
-
-    questions = extract_questions_from_json(json_data)
-
-    results = vector_db.compare_all(questions, n_results=2)
-
-    new_json = []
-    for idx, res in enumerate(results[constants.DIST]):
-        new_obj = deepcopy(json_data[idx])
-        sim_score = results[constants.DIST][idx][1]
-        if sim_score > 0.23:
-            new_obj[constants.SIM_SCORE] = results[constants.DIST][idx][1]
-            new_obj[constants.SIM_QS] = results[constants.DOC][idx][1]
-            new_json.append(new_obj)
-        else:
-            continue
-    return new_json
-
-@app.post("/dedup_within_json")
 async def dedup_json(json_file: UploadFile=File(...)):
     content = await json_file.read()
     json_data = json.loads(content)
